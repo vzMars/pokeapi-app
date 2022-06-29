@@ -1,1 +1,1 @@
-# simple-pokeapi-app-
+# simple-pokeapi-app
