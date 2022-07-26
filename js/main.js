@@ -17,17 +17,26 @@ const colors = {
   fairy: '#ee99ac',
 };
 
-const getPokemon = (limit) => {
-  fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}`)
-    .then((res) => res.json())
-    .then(({ results }) =>
-      Promise.all(results.map((result) => fetch(result.url)))
-    )
-    .then((responses) => Promise.all(responses.map((res) => res.json())))
-    .then((pokemon) => pokemon.forEach((pokemon) => renderPokemon(pokemon)))
-    .catch((err) => {
-      console.log(`error: ${err}`);
+const fetchPokemon = async (limit) => {
+  try {
+    const response = await fetch(
+      `https://pokeapi.co/api/v2/pokemon?limit=${limit}`
+    );
+    const { results } = await response.json();
+
+    const pokemonDetails = results.map(async (result) => {
+      const response = await fetch(result.url);
+      return response.json();
     });
+
+    const pokemon = await Promise.all(pokemonDetails);
+
+    pokemon.forEach((poke) => {
+      renderPokemon(poke);
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const renderPokemon = (pokemon) => {
@@ -45,4 +54,4 @@ const renderPokemon = (pokemon) => {
   container.append(pokeContainer);
 };
 
-getPokemon(151);
+fetchPokemon(151);
